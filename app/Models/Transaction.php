@@ -5,18 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Transaction extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        "name",
-        "type",
-        "status",
+        "date",
+        "amount",
+        "description",
     ];
 
-    public function transactions()
+    public function category()
     {
-        return $this->hasMany(Transaction::class);
+        return $this->belongsTo(Category::class);
     }
 }
