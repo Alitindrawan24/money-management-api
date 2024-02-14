@@ -8,6 +8,8 @@ use DivisionByZeroError;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\TransactionTag;
+use App\Http\Resources\TransactionResource;
+use App\Http\Requests\Transaction\StoreRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TransactionController extends Controller
@@ -17,19 +19,19 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $transactions = Transaction::get();
+        $transactions = Transaction::with("category", "tags")->get();
 
         return \response()->json([
             "status" => "success",
             "message" => "Get transactions successfully",
-            "data" => $transactions
+            "data" => TransactionResource::collection($transactions)
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
         $category = Category::findOrFail($request->category_id);
         $transaction = $category->transactions()->create([
@@ -38,7 +40,7 @@ class TransactionController extends Controller
             "description" => $request->description,
         ]);
 
-        if (count($request->tag_ids) > 0) {
+        if (count($request->tag_ids ?? []) > 0) {
             $transaction->tags()->attach($request->tag_ids);
         }
 
@@ -64,7 +66,7 @@ class TransactionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Transaction $transaction)
+    public function update(StoreRequest $request, Transaction $transaction)
     {
         $transaction->update([
             "category_id" => $request->category_id,
