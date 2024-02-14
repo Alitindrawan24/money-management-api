@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Throwable;
 use App\Models\Category;
 use DivisionByZeroError;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Models\TransactionTag;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Throwable;
 
 class TransactionController extends Controller
 {
@@ -37,6 +38,10 @@ class TransactionController extends Controller
             "description" => $request->description,
         ]);
 
+        if (count($request->tag_ids) > 0) {
+            $transaction->tags()->attach($request->tag_ids);
+        }
+
         return \response()->json([
             "status" => "success",
             "message" => "Store transactions successfully",
@@ -52,7 +57,7 @@ class TransactionController extends Controller
         return \response()->json([
             "status" => "success",
             "message" => "Show transactions successfully",
-            "data" => $transaction
+            "data" => $transaction->load("tags")
         ]);
     }
 
@@ -68,6 +73,8 @@ class TransactionController extends Controller
             "description" => $request->description,
         ]);
 
+        $transaction->tags()->sync($request->tag_ids);
+
         return \response()->json([
             "status" => "success",
             "message" => "Update transactions successfully",
@@ -80,6 +87,8 @@ class TransactionController extends Controller
      */
     public function destroy(Transaction $transaction)
     {
+        $transaction->tags()->detach();
+
         $transaction->delete();
         return \response()->json([
             "status" => "success",
