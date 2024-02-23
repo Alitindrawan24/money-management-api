@@ -8,6 +8,7 @@ use DivisionByZeroError;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\TransactionTag;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\TransactionResource;
 use App\Http\Requests\Transaction\StoreRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -19,7 +20,8 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $transactions = Transaction::with("category", "tags")->get();
+        $transactions = Transaction::with("category", "tags")
+        ->get();
 
         return \response()->json([
             "status" => "success",
@@ -35,6 +37,7 @@ class TransactionController extends Controller
     {
         $category = Category::findOrFail($request->category_id);
         $transaction = $category->transactions()->create([
+            "user_id" => auth()->user()->id,
             "date" => $request->date,
             "amount" => $request->amount,
             "description" => $request->description,
@@ -56,6 +59,8 @@ class TransactionController extends Controller
      */
     public function show(Transaction $transaction)
     {
+        $this->authorize('view', $transaction);
+
         return \response()->json([
             "status" => "success",
             "message" => "Show transactions successfully",
@@ -68,6 +73,8 @@ class TransactionController extends Controller
      */
     public function update(StoreRequest $request, Transaction $transaction)
     {
+        $this->authorize('update', $transaction);
+
         $transaction->update([
             "category_id" => $request->category_id,
             "date" => $request->date,
@@ -89,6 +96,8 @@ class TransactionController extends Controller
      */
     public function destroy(Transaction $transaction)
     {
+        $this->authorize('delete', $transaction);
+
         $transaction->tags()->detach();
 
         $transaction->delete();
