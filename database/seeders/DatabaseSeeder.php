@@ -3,7 +3,10 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
+use App\Models\Transaction;
 use Illuminate\Database\Seeder;
+use Database\Factories\TransactionFactory;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,9 +17,17 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $user = User::factory()->create([
+            'name' => 'Test',
+            'email' => 'test@example.com',
+        ]);
+
+        for ($i=0; $i < 5; $i++) {
+            Transaction::factory()->create([
+                "user_id" => $user->id
+            ]);
+        }
+
+
     }
 }

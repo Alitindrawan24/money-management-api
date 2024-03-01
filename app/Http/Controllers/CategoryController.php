@@ -15,12 +15,12 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::paginate();
+        $categories = Category::latest()->get();
 
         return \response()->json([
             "status" => "success",
             "message" => "Get all categories successfully",
-            "data" => CategoryResource::collection($categories)->response()->getData(true),
+            "data" => CategoryResource::collection($categories),
         ]);
     }
 
