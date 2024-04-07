@@ -15,12 +15,12 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::latest()->get();
+        $categories = Category::owned()->latest()->paginate();
 
         return \response()->json([
             "status" => "success",
             "message" => "Get all categories successfully",
-            "data" => CategoryResource::collection($categories),
+            "data" => CategoryResource::collection($categories)->response()->getData(true),
         ]);
     }
 
@@ -30,6 +30,7 @@ class CategoryController extends Controller
     public function store(StoreRequest $request)
     {
         $category = Category::create([
+            "user_id" => auth()->user()->id,
             "name" => $request->name,
             "type" => $request->type,
             "status" => $request->status,
@@ -47,6 +48,8 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
+        $this->authorize('view', $category);
+
         return \response()->json([
             "status" => "success",
             "message" => "Get category successfully",
@@ -59,6 +62,8 @@ class CategoryController extends Controller
      */
     public function update(StoreRequest $request, Category $category)
     {
+        $this->authorize('update', $category);
+
         $category->update([
             "name" => $request->name,
             "type" => $request->type,
@@ -77,6 +82,8 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        $this->authorize('delete', $category);
+
         $category->delete();
 
         return \response()->json([

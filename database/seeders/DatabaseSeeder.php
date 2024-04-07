@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\Category;
 use App\Models\User;
 use App\Models\Transaction;
 use Illuminate\Database\Seeder;
@@ -23,8 +25,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         for ($i=0; $i < 5; $i++) {
-            Transaction::factory()->create([
+            $category = Category::factory()->create([
                 "user_id" => $user->id
+            ]);
+
+            Transaction::factory(2)->create([
+                "user_id" => $user->id,
+                "category_id" => $category->id
             ]);
         }
 
