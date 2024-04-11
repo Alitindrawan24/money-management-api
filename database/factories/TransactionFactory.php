@@ -26,7 +26,7 @@ class TransactionFactory extends Factory
                 return Category::factory()->create()->id;
             },
             "date" => $this->faker->date(),
-            "amount" => $this->faker->randomFloat(null, 1000, 10000),
+            "amount" => $this->faker->randomFloat(0, 100, 1000) * 100,
             "description" => $this->faker->sentence(5),
         ];
     }

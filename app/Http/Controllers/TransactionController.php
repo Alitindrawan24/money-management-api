@@ -21,12 +21,15 @@ class TransactionController extends Controller
     public function index()
     {
         $transactions = Transaction::with("category", "tags")
-        ->get();
+        ->owned()
+        ->orderBy("date", "desc")
+        ->latest()
+        ->paginate();
 
         return \response()->json([
             "status" => "success",
             "message" => "Get transactions successfully",
-            "data" => TransactionResource::collection($transactions)
+            "data" => TransactionResource::collection($transactions)->response()->getData(true)
         ]);
     }
 
@@ -64,7 +67,7 @@ class TransactionController extends Controller
         return \response()->json([
             "status" => "success",
             "message" => "Show transactions successfully",
-            "data" => $transaction->load("tags")
+            "data" => new TransactionResource($transaction->load("tags", "category"))
         ]);
     }
 
