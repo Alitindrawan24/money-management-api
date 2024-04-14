@@ -29,29 +29,4 @@ class StoreRequest extends FormRequest
             "status" => "required|in:0,1",
         ];
     }
-
-    public function messages()
-    {
-        return [
-            "required" => ":attribute wajib diisi ygy",
-            "type.required" => ":attribute wajib yaa tolong"
-        ];
-    }
-
-    public function attributes()
-    {
-        return  [
-            "name" => "Nama"
-        ];
-    }
-
-    public function failedValidation(Validator $validator) {
-        throw new HttpResponseException(
-            response()->json([
-                "status" => "fail",
-                "message" => "Validation failed",
-                "errors" => $validator->errors()
-            ], 422)
-        );
-    }
 }
